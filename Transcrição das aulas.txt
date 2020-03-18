@@ -1,0 +1,10 @@
+ASP.NET MVC
+
+Transcrição
+
+Módulo 1
+Recapitulando, começamos entendendo que para transformar nossa aplicação console em um servidor web, precisaríamos instalar o Asp.NET Core, que possui um tipo que representa o hospedeiro web, uma interface chamada IWebHost. E para criar um objeto que a implementa, usamos um builder padrão.
+
+Ele, por sua vez, é representado pela classe Web Host Builder, para o qual passamos apenas duas opções, importantes para conseguirmos subir a aplicação: por meio do método UseKestrel(), que indica que utilizaremos, para este host, o servidor Kestrel, e UseStartup<>(), para indicar a classe de inicialização do servidor web.
+
+Esta classe de inicialização tem um código pequeno, para "amarrar" a chegada da requisição com o código de atendimento, com a resposta que queremos escrever. E este código é isolado em um método de tipo específico, um Delegate, chamado Request Delegate, sobre o qual ainda veremos bastante.

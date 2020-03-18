@@ -11,6 +11,9 @@ namespace Alura.ListaLeitura.App
         public void Configure(IApplicationBuilder app)
         {//Configurar a sequencia "Chegou requisicao e executa o tal método
             //Fluxo de request-response
+            /*
+             * Request Pipeline: Termo usado pelo ASP.NET Core para representar o fluxo que uma requisição HTTP percorre dentro de sua aplicação até que a resposta seja entregue ao cliente.
+             */
             //IAapplicationBuilder realiza a configuração do Request Pipeline de requisicao para a aplicação
             app.Run(LivrosParaLer);
             //O método Run, precisa de um retorno do tipo RequestDelegate
