@@ -1,6 +1,7 @@
 ﻿using Alura.ListaLeitura.App.Repositorio;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Alura.ListaLeitura.App
@@ -15,9 +16,34 @@ namespace Alura.ListaLeitura.App
              * Request Pipeline: Termo usado pelo ASP.NET Core para representar o fluxo que uma requisição HTTP percorre dentro de sua aplicação até que a resposta seja entregue ao cliente.
              */
             //IAapplicationBuilder realiza a configuração do Request Pipeline de requisicao para a aplicação
-            app.Run(LivrosParaLer);
+            app.Run(Roteamento);
             //O método Run, precisa de um retorno do tipo RequestDelegate
             //Um requestDelegate é um metodo que tem como retorno tipos Task
+        }
+
+        public Task Roteamento(HttpContext context)
+        {
+            //Roteamento dos endereços
+            //Livros/ParaLer
+            //Livros/Lendo
+            //Livros/Lido
+
+            var _repo = new LivroRepositorioCSV();
+
+            var caminhosAtendidos = new Dictionary<string, string>
+            {
+             //Settando elementos chave/valor do dicionario, que se tornaram parte do roteamento     
+                {"/Livros/ParaLer", _repo.ParaLer.ToString() },
+                {"/Livros/Lendo", _repo.Lendo.ToString() },
+                {"/Livros/Lido", _repo.Lidos.ToString() }
+            };
+            //Verifica se o context.Request.Path é igual a uma das chaves do dicionario, se for acessa a url
+            if (caminhosAtendidos.ContainsKey(context.Request.Path)){
+                return context.Response.WriteAsync(caminhosAtendidos[context.Request.Path]);
+            }
+
+            context.Response.StatusCode = 404;//Caso retorne o endereço invalido, o resultado do status request deve ser 404 de error:not found.
+            return context.Response.WriteAsync("Endereço invalido."); //Se o caminho do context não estiver como key do Dictionary, envio "caminho inexistente"
         }
 
         public Task LivrosParaLer(HttpContext context)
