@@ -30,16 +30,19 @@ namespace Alura.ListaLeitura.App
 
             var _repo = new LivroRepositorioCSV();
 
-            var caminhosAtendidos = new Dictionary<string, string>
+            var caminhosAtendidos = new Dictionary<string, RequestDelegate>
             {
              //Settando elementos chave/valor do dicionario, que se tornaram parte do roteamento     
-                {"/Livros/ParaLer", _repo.ParaLer.ToString() },
-                {"/Livros/Lendo", _repo.Lendo.ToString() },
-                {"/Livros/Lido", _repo.Lidos.ToString() }
+                {"/Livros/ParaLer", LivrosParaLer },
+                {"/Livros/Lendo", LivrosLendo},
+                {"/Livros/Lido", LivrosLidos}
             };
             //Verifica se o context.Request.Path é igual a uma das chaves do dicionario, se for acessa a url
             if (caminhosAtendidos.ContainsKey(context.Request.Path)){
-                return context.Response.WriteAsync(caminhosAtendidos[context.Request.Path]);
+
+                var metodo = caminhosAtendidos[context.Request.Path];
+                //Para invocar um metodo do tipo RequestDelegate, utiliza-se o Invoke
+                return metodo.Invoke(context);
             }
 
             context.Response.StatusCode = 404;//Caso retorne o endereço invalido, o resultado do status request deve ser 404 de error:not found.
@@ -55,8 +58,27 @@ namespace Alura.ListaLeitura.App
             //Response é a property do httpcontext que vem como resposta, e escrevemos nossa lista.
             return context.Response.WriteAsync(_repo.ParaLer.ToString());
 
-            
+        }
 
+        public Task LivrosLendo(HttpContext context)
+        {//Codigo executado quando chegar uma requisicao, recebe um obj com todas as informações referentes a aquela request
+            //Toda informacao encapsulada em uma request especifica fica encapsulada em objs. do tipo HttpContext
+
+            var _repo = new LivroRepositorioCSV();
+
+            //Response é a property do httpcontext que vem como resposta, e escrevemos nossa lista.
+            return context.Response.WriteAsync(_repo.ParaLer.ToString());
+
+        }
+
+        public Task LivrosLidos(HttpContext context)
+        {//Codigo executado quando chegar uma requisicao, recebe um obj com todas as informações referentes a aquela request
+            //Toda informacao encapsulada em uma request especifica fica encapsulada em objs. do tipo HttpContext
+
+            var _repo = new LivroRepositorioCSV();
+
+            //Response é a property do httpcontext que vem como resposta, e escrevemos nossa lista.
+            return context.Response.WriteAsync(_repo.ParaLer.ToString());
 
         }
     }
