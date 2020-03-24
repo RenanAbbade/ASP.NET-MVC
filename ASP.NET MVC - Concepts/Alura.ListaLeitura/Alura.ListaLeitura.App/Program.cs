@@ -21,10 +21,6 @@ namespace Alura.ListaLeitura.App
             //Para subir o hospedeiro para o mesmo ficar disponivel para receber as chamadas web.
             host.Run();
 
-            
-
-            
-
             ImprimeLista(_repo.ParaLer);
             ImprimeLista(_repo.Lendo);
             ImprimeLista(_repo.Lidos);

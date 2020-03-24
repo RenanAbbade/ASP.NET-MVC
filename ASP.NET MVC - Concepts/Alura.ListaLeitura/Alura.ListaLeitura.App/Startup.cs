@@ -1,24 +1,67 @@
-﻿using Alura.ListaLeitura.App.Repositorio;
+﻿using Alura.ListaLeitura.App.Negocio;
+using Alura.ListaLeitura.App.Repositorio;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Alura.ListaLeitura.App
 {
     public class Startup
     {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddRouting();//Significa que minha app está usando o serviço de roteamento do ASP.NET CORE
+        }
 
         public void Configure(IApplicationBuilder app)
         {//Configurar a sequencia "Chegou requisicao e executa o tal método
-            //Fluxo de request-response
-            /*
-             * Request Pipeline: Termo usado pelo ASP.NET Core para representar o fluxo que uma requisição HTTP percorre dentro de sua aplicação até que a resposta seja entregue ao cliente.
-             */
-            //IAapplicationBuilder realiza a configuração do Request Pipeline de requisicao para a aplicação
-            app.Run(Roteamento);
+         //Fluxo de request-response
+         /*
+          * Request Pipeline: Termo usado pelo ASP.NET Core para representar o fluxo que uma requisição HTTP percorre dentro de sua aplicação até que a resposta seja entregue ao cliente.
+          */
+         //IAapplicationBuilder realiza a configuração do Request Pipeline de requisicao para a aplicação
+
+            var builder = new RouteBuilder(app);//Classe responsavel pela construção das rotas no ASP.NET CORE
+
+            builder.MapRoute("Livros/ParaLer",LivrosParaLer);//Para cada rota que queremos atender, usamos o MapRoute
+            builder.MapRoute("Livros/Lendo", LivrosLendo);
+            builder.MapRoute("Livros/Lido", LivrosLidos);
+            builder.MapRoute("Cadastro/NovoLivro/{nome}/{autor}", NovoLivroParaler);
+            builder.MapRoute("Livros/Detalhes/{id:int}", ExibeDetalhes);//Inserindo restrição Constraint para ir para o metodo somente quanto id for int
+
+            var rotas = builder.Build();//Construção das rotas
+
+            app.UseRouter(rotas);
+
+            //app.Run(Roteamento);
             //O método Run, precisa de um retorno do tipo RequestDelegate
             //Um requestDelegate é um metodo que tem como retorno tipos Task
+        }
+
+        private Task ExibeDetalhes(HttpContext context)
+        {
+            int id = Convert.ToInt32(context.GetRouteValue("id"));
+            var repo = new LivroRepositorioCSV();
+            var livro = repo.Todos.First(l => l.Id == id);
+            return context.Response.WriteAsync(livro.Detalhes());
+        }
+
+        private Task NovoLivroParaler(HttpContext context)
+        {
+            var livro = new Livro()
+            {
+                Titulo = context.GetRouteValue("nome").ToString(),//Acessa valor passado no {nome} no rota do contexto
+                Autor = context.GetRouteValue("autor").ToString(),//Acessa valor passado no {autor} no rota do contexto
+            };
+
+            var repo = new LivroRepositorioCSV();
+            repo.Incluir(livro);
+            return context.Response.WriteAsync("O livro foi adicionado com sucesso");
         }
 
         public Task Roteamento(HttpContext context)
@@ -67,7 +110,7 @@ namespace Alura.ListaLeitura.App
             var _repo = new LivroRepositorioCSV();
 
             //Response é a property do httpcontext que vem como resposta, e escrevemos nossa lista.
-            return context.Response.WriteAsync(_repo.ParaLer.ToString());
+            return context.Response.WriteAsync(_repo.Lendo.ToString());
 
         }
 
@@ -78,7 +121,7 @@ namespace Alura.ListaLeitura.App
             var _repo = new LivroRepositorioCSV();
 
             //Response é a property do httpcontext que vem como resposta, e escrevemos nossa lista.
-            return context.Response.WriteAsync(_repo.ParaLer.ToString());
+            return context.Response.WriteAsync(_repo.Lidos.ToString());
 
         }
     }
